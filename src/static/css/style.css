@@ -1,0 +1,10 @@
+h1 {
+    border: 2px #eee solid;
+    color: #fc3d17;
+    text-align: center;
+    padding: 10px;
+}
+
+.navbar-nav .nav-item {
+    margin-right: 15px;
+}
