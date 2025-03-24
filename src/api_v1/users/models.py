@@ -3,10 +3,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
-from src.app import db
+from src.base import Base
 
 
-class User(db.Model):
+class User(Base):
     username: Mapped[str] = mapped_column(unique=True)
     password_hash: Mapped[str]
 

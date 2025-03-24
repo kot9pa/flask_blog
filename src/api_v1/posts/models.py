@@ -1,10 +1,10 @@
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.app import db
+from src.base import Base
 
 
-class Post(db.Model):
+class Post(Base):
     title: Mapped[str]
     content: Mapped[str] = mapped_column(nullable=True)
 
@@ -29,5 +29,5 @@ class PostBody(BaseModel):
     content: str | None = None
 
 class PostUpdate(BaseModel):
-    title: str | None = None
+    title: str | None = Field(default=None, min_length=3)
     content: str | None = None

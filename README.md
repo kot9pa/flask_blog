@@ -11,8 +11,10 @@
 Swagger UI http://localhost:5000/openapi/swagger  
 
 ## Frontend
-URL http://localhost:5000
-
-Тестовый доступ:  
+URL http://localhost:5000  
 Логин: username  
 Пароль: password
+
+## Test
+Запуск pytest  
+`coverage run -m pytest`  

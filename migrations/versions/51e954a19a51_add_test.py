@@ -56,6 +56,8 @@ def upgrade():
             },
         ],
     )
+    op.execute("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users))")
+    op.execute("SELECT setval('posts_id_seq', (SELECT MAX(id) FROM posts))")
 
 
 def downgrade():

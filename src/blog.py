@@ -1,9 +1,9 @@
-from flask import Blueprint, abort, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
 from pydantic import ValidationError
 
 from src.api_v1.posts import api
 from src.auth import login_required
-from src.api_v1.posts.models import PostBody
+from src.api_v1.posts.models import PostBody, PostUpdate
 
 
 blog_bp = Blueprint('blog', __name__)
@@ -29,9 +29,7 @@ def post(id):
 def create():
     if request.method == 'POST':
         try:
-            title = request.form['title']
-            content = request.form['content']
-            post = PostBody(title=title, content=content)
+            post = PostBody.model_validate(request.form.to_dict())
             api.create(post)
             return redirect(url_for('index'))
         except ValidationError as err:
@@ -46,13 +44,11 @@ def edit(id):
         abort(404)
     if request.method == 'POST':
         try:
-            title = request.form['title']
-            content = request.form['content']
-            post_update = PostBody(title=title, content=content)
+            post_update = PostUpdate.model_validate(request.form.to_dict())
             api.update(post, post_update, partial=True)
             return redirect(url_for('index'))
         except ValidationError as err:
-            flash(err)
+            flash(err.json(), 'error')
     return render_template('edit.html', post=post)
 
 @blog_bp.route('/<int:id>/delete', methods=('POST',))

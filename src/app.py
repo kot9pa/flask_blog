@@ -12,7 +12,7 @@ from src.database import db, migrate
 from src.config import settings
 
 
-def create_app():
+def create_app(test_config=None):
     # Basic Authentication
     basic = {
         "type": "http",
@@ -22,6 +22,9 @@ def create_app():
 
     # Create and configure Application
     app = OpenAPI(__name__, security_schemes=security_schemes)
+    if test_config:
+        # load the test config if passed in
+        app.config.update(test_config)
     app.secret_key = secrets.token_hex()
     app.config["SQLALCHEMY_DATABASE_URI"] = settings.get_db_url()
 
@@ -29,6 +32,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     app.cli.add_command(drop_db_command)
+    app.cli.add_command(create_db_command)
 
     # Register Blueprints
     from src.api_v1.posts.view import posts_api_blueprint
@@ -46,13 +50,20 @@ def create_app():
     return app
 
 def drop_db():
-    # Clear existing data
     db.drop_all()
 
 @click.command("drop-db")
 @with_appcontext
 def drop_db_command():
     drop_db()
+
+def create_db():
+    db.create_all()
+
+@click.command("create-db")
+@with_appcontext
+def create_db_command():
+    create_db()
 
 if __name__ == "__main__":
     app = create_app()
