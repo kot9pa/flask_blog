@@ -1,4 +1,3 @@
-from flask_migrate import upgrade
 from sqlalchemy import text
 
 from src.app import db

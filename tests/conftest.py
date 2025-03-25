@@ -33,13 +33,12 @@ def app():
     })
 
     with app.app_context():
+        downgrade(revision='base')
         app.test_cli_runner().invoke(args=['drop-db'])
         upgrade(revision='head')
     
     yield app
 
-    with app.app_context():
-        downgrade(revision='base')
 
 @pytest.fixture()
 def client(app):

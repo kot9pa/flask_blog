@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED=1
 COPY requirements.txt .env /app/
 COPY /src /app/src
 COPY /migrations /app/migrations
+COPY /tests /app/tests
 
 # Set working directory
 WORKDIR /app
