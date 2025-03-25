@@ -3,8 +3,9 @@ import secrets
 import sys
 import click
 from flask.cli import with_appcontext
-from flask_migrate import Migrate
+from flask_session import Session
 from flask_openapi3 import OpenAPI
+from redis import Redis
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
@@ -13,22 +14,28 @@ from src.config import settings
 
 
 def create_app(test_config=None):
-    # Basic Authentication
-    basic = {
-        "type": "http",
-        "scheme": "basic"
-    }
-    security_schemes = {"basic": basic}
-
     # Create and configure Application
-    app = OpenAPI(__name__, security_schemes=security_schemes)
+    app = OpenAPI(__name__, security_schemes=settings.security_schemes)
     if test_config:
         # load the test config if passed in
         app.config.update(test_config)
-    app.secret_key = secrets.token_hex()
+    
+    # if you are using client-side sessions ie. not Flask-Session
+    # app.secret_key = secrets.token_hex()    
+    # app.config['SESSION_USE_SIGNER'] = True
+
+    # Configure Redis storage
+    app.config['SESSION_TYPE'] = 'redis'
+    # app.config['SESSION_PERMANENT'] = False    
+    app.config['SESSION_REDIS'] = Redis.from_url(settings.get_redis_url())
+
+    # Initialize Flask-Session
+    Session(app)
+
+    # Configure SQLAlchemy
     app.config["SQLALCHEMY_DATABASE_URI"] = settings.get_db_url()
 
-    # Initialize Flask-SQLAlchemy, Flask-Migrate and the init-db command
+    # Initialize Flask-SQLAlchemy, Flask-Migrate and other commands
     db.init_app(app)
     migrate.init_app(app, db)
     app.cli.add_command(drop_db_command)
